@@ -4,7 +4,7 @@
 
 ### Как установить
 
-1. Создайте приложение в VK ([ссылка](https://vk.com/apps?act=manage)) и получите его ID. Затем получите [access_token](https://vk.com/dev/implicit_flow_user) со следующими правами: `photos, groups, wall, offline`. Также создайте своё сообщество в VK и [узнайте его ID](https://regvk.com/id/)). А в конце создайте файл с названием .env и добавьте всё, что Вы получили выше. Вот пример:
+1. Создайте приложение в VK ([ссылка](https://vk.com/apps?act=manage)) и получите его ID. Затем получите [access_token](https://vk.com/dev/implicit_flow_user) со следующими правами: `photos, groups, wall, offline`. Также создайте своё сообщество в VK и [узнайте его ID](https://regvk.com/id/). А в конце создайте файл с названием .env и добавьте всё, что Вы получили выше. Вот пример:
 ```
 CLIENT_ID = 0000000
 GROUP_ID = 0000001
