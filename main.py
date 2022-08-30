@@ -12,16 +12,18 @@ def download_file(url, path):
 
 
 def upload_file(file_name, upload_url):
-    try:
-        with open(file_name, 'rb') as file:
-            files = {
-                'photo': file
-            }
-            response = requests.post(upload_url, files=files)
-        response.raise_for_status()
-        return response.json()
-    finally:
-        os.remove(file_name)
+    with open(file_name, 'rb') as file:
+        files = {
+            'photo': file
+        }
+        response = requests.post(upload_url, files=files)
+    response.raise_for_status()
+    server_answer = response.json()
+    return (
+        server_answer['photo'],
+        server_answer['server'],
+        server_answer['hash']
+        )
 
 
 def get_last_comic_issue():
@@ -73,45 +75,48 @@ def save_comic(vk_token, group_id, version, photo, server, server_hash):
         params=payload
     )
     response.raise_for_status()
-    return response.json()['response'][0]
+    save_comic = response.json()['response'][0]
+    return save_comic['owner_id'], save_comic['id']
 
 
 def get_comic(comic_number):
     url = f'https://xkcd.com/{comic_number}/info.0.json'
     response = requests.get(url)
     response.raise_for_status()
-    return response.json()
+    return response.json()['img'], response.json()['alt']
 
 
 def main():
-    load_dotenv()
-    vk_token = os.environ['VK_TOKEN']
-    version = 5.131
-    group_id = os.environ['GROUP_ID']
-    file_name = 'file.png'
-    comics_amount = get_last_comic_issue()
-    comic_number = random.randint(0, comics_amount)
-    received_comic = get_comic(comic_number)
-    image_url = received_comic['img']
-    download_file(image_url, file_name)
-    upload_url = get_upload_url(vk_token, group_id, version)
-    upload_comic = upload_file(file_name, upload_url)
-    about_save_comic = save_comic(
-        vk_token,
-        group_id,
-        version,
-        upload_comic['photo'],
-        upload_comic['server'],
-        upload_comic['hash']
-    )
-    post_comic(
-        group_id,
-        received_comic['alt'],
-        about_save_comic['owner_id'],
-        about_save_comic['id'],
-        vk_token,
-        version
-    )
+    try:
+        load_dotenv()
+        vk_token = os.environ['VK_TOKEN']
+        version = 5.131
+        group_id = os.environ['GROUP_ID']
+        file_name = 'file.png'
+        comics_amount = get_last_comic_issue()
+        comic_number = random.randint(0, comics_amount)
+        (image_url, image_alt) = get_comic(comic_number)
+        download_file(image_url, file_name)
+        uploading_url = get_upload_url(vk_token, group_id, version)
+        (photo, server, server_hash) = upload_file(file_name, uploading_url)
+        (owner_id, id) = save_comic(
+            vk_token,
+            group_id,
+            version,
+            photo,
+            server,
+            server_hash
+        )
+        post_comic(
+            group_id,
+            image_alt,
+            owner_id,
+            id,
+            vk_token,
+            version
+        )
+    finally:
+        os.remove(file_name)
 
 
 if __name__ == '__main__':
