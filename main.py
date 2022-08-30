@@ -95,11 +95,11 @@ def main():
         file_name = 'file.png'
         comics_amount = get_last_comic_issue()
         comic_number = random.randint(0, comics_amount)
-        (image_url, image_alt) = get_comic(comic_number)
+        image_url, image_alt = get_comic(comic_number)
         download_file(image_url, file_name)
         uploading_url = get_upload_url(vk_token, group_id, version)
-        (photo, server, server_hash) = upload_file(file_name, uploading_url)
-        (owner_id, id) = save_comic(
+        photo, server, server_hash = upload_file(file_name, uploading_url)
+        owner_id, media_id = save_comic(
             vk_token,
             group_id,
             version,
@@ -111,7 +111,7 @@ def main():
             group_id,
             image_alt,
             owner_id,
-            id,
+            media_id,
             vk_token,
             version
         )
